@@ -1,0 +1,40 @@
+services:
+  - type: web
+    name: entity-catalog-api
+    runtime: node
+    plan: free
+    region: frankfurt
+    buildCommand: npm ci
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: JWT_SECRET
+        sync: false
+      - key: DB_HOST
+        fromDatabase:
+          name: entity-catalog-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: entity-catalog-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: entity-catalog-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: entity-catalog-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: entity-catalog-db
+          property: password
+
+databases:
+  - name: entity-catalog-db
+    plan: free
+    region: frankfurt

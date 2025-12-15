@@ -1,0 +1,6 @@
+node_modules
+.env
+.secrets.baseline
+coverage
+npm-debug.log*
+.DS_Store
