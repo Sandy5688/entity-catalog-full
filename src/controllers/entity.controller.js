@@ -1,9 +1,6 @@
 import pool from '../services/db.js';
 import { logAdminAction } from '../services/adminAudit.service.js';
 
-export async function mergeEntities(req, res) {
-  const { sourceId, targetId, dryRun } = req.body;
-
   if (!sourceId || !targetId) {
     return res.status(400).json({ message: 'sourceId and targetId required' });
   }
