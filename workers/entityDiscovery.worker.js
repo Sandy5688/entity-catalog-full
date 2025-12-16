@@ -1,4 +1,5 @@
 import entityService from '../src/services/entityCatalog.service.js';
+import { insertOrUpdateEntity } from '../src/services/entityCatalog.service.js';
 import {
   entityCreatedTotal,
   discoveryRunDurationSeconds,

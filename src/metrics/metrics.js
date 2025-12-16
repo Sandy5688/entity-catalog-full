@@ -1,37 +1,53 @@
-// src/metrics/metrics.js
-
 import client from 'prom-client';
+
+/**
+ * Clear registry between test runs
+ */
+if (process.env.NODE_ENV === 'test') {
+  client.register.clear();
+}
+
+export const register = client.register;
 
 client.collectDefaultMetrics();
 
-export const entityCreatedTotal = new client.Counter({
-  name: 'entity_created_total',
-  help: 'Total entities created',
-});
+/* ===============================
+   Entity Metrics
+================================ */
 
-export const entityUpdatedTotal = new client.Counter({
-  name: 'entity_updated_total',
-  help: 'Total entities updated',
-});
+export const entityCreatedTotal =
+  client.register.getSingleMetric('entity_created_total') ||
+  new client.Counter({
+    name: 'entity_created_total',
+    help: 'Total entities created',
+  });
 
-export const metadataPackagesImportedTotal = new client.Counter({
-  name: 'metadata_packages_imported_total',
-  help: 'Metadata packages imported',
-});
+export const entityUpdatedTotal =
+  client.register.getSingleMetric('entity_updated_total') ||
+  new client.Counter({
+    name: 'entity_updated_total',
+    help: 'Total entities updated',
+  });
 
-export const discoveryRunDurationSeconds = new client.Histogram({
-  name: 'discovery_run_duration_seconds',
-  help: 'Entity discovery duration',
-});
+/* ===============================
+   Metadata Metrics
+================================ */
 
-export const scrapeErrorTotal = new client.Counter({
-  name: 'scrape_error_total',
-  help: 'Scraper errors',
-});
+export const metadataPackagesImportedTotal =
+  client.register.getSingleMetric('metadata_packages_imported_total') ||
+  new client.Counter({
+    name: 'metadata_packages_imported_total',
+    help: 'Total metadata packages imported',
+  });
 
-export const cacheHitRatio = new client.Gauge({
-  name: 'cache_hit_ratio',
-  help: 'Cache hit ratio',
-});
+/* ===============================
+   Discovery Worker Metrics
+================================ */
 
-export const register = client.register;
+export const discoveryRunDurationSeconds =
+  client.register.getSingleMetric('discovery_run_duration_seconds') ||
+  new client.Histogram({
+    name: 'discovery_run_duration_seconds',
+    help: 'Duration of discovery worker runs',
+    buckets: [0.1, 0.5, 1, 2, 5, 10],
+  });

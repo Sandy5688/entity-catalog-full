@@ -1,0 +1,135 @@
+Entity Catalog
+
+A global, category-agnostic Entity Catalog that stores basic metadata about any organization in any country.
+
+Features
+
+Minimal PostgreSQL core for entity storage
+
+Optional metadata catalog for raw packages
+
+Semi-structured text suggestions, discovery worker, and manual admin import
+
+Stateless microservices:
+
+Matching layer (fuzzy + phonetic)
+
+Scraper adapter with robots.txt respect
+
+Region resolver with caching
+
+Cache aggregator
+
+Full authentication + role-based access control
+
+Prometheus metrics
+
+Admin audit logging + merge dry-run
+
+Production-ready Dockerfile + healthcheck
+
+Repository Structure
+/migrations/...
+/src/services/...
+/src/controllers/...
+/src/routes/...
+/workers/...
+/docs/ENTITY_CATALOG.md
+/tests/...
+Dockerfile.prod
+
+Getting Started
+1. Clone Repository
+git clone https://github.com/<YOUR_USERNAME>/entity-catalog.git
+cd entity-catalog
+
+2. Install Dependencies
+npm install
+
+3. Environment
+
+Create a .env file using .env.example:
+
+cp .env.example .env
+
+
+Fill in your database, Redis, and auth credentials.
+
+4. Database Migrations
+npx sequelize db:migrate
+
+
+Verify migrations:
+
+npm test tests/migration.test.js
+
+5. Running Tests
+npm test
+
+
+All unit tests for workers, services, endpoints, metrics, and region caching are included.
+
+6. Start Application
+npm run dev
+
+7. API Endpoints
+
+Entity
+
+GET    /api/v1/entity?country=XX&region=YY&category=any
+GET    /api/v1/entity/:id
+POST   /api/v1/entity/import/manual
+POST   /api/v1/entity/suggest
+POST   /api/v1/entity/:id/refresh-metadata
+
+
+Rules
+
+All write operations require authentication
+
+RBAC applied: system, admin, reader
+
+Metrics
+
+GET /metrics
+
+8. Workers
+
+entityDiscovery.worker.js → Scrapes public directories, inserts/updates entities
+
+metadataIngestion.worker.js → Stores raw JSON from structured sources
+
+9. Docker (Production)
+docker build -f Dockerfile.prod -t entity-catalog .
+docker run -d -p 3000:3000 --env-file .env entity-catalog
+curl http://localhost:3000/healthz
+
+10. Metrics
+
+Prometheus metrics exposed at /metrics:
+
+entity_created_total
+
+entity_updated_total
+
+metadata_packages_imported_total
+
+discovery_run_duration_seconds
+
+scrape_error_total
+
+cache_hit_ratio
+
+11. Admin Audit Logging
+
+All admin actions (merge, edit, toggle) logged in admin_audit_log table. Dry-run mode supported.
+
+12. Security & Compliance
+
+No secrets in repo
+
+.env excluded in .gitignore
+
+Scraper respects robots.txt
+
+Rate-limited requests with retry/backoff

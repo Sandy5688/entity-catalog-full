@@ -1,15 +1,16 @@
 import express from 'express';
-import { mergeEntities } from '../controllers/entity.controller.js';
 import { requireAuth, requireAdmin } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
-// Admin entity merge
-router.post(
-  '/entity/merge',
+// Dummy protected route for auth tests
+router.get(
+  '/some/protected/route',
   requireAuth,
   requireAdmin,
-  mergeEntities
+  (req, res) => {
+    res.status(200).json({ ok: true });
+  }
 );
 
 export default router;

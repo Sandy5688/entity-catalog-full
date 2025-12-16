@@ -1,5 +1,6 @@
 import request from 'supertest';
-import app from '../src/app.js';
+import app from '../app.js';
+import { entityCreatedTotal } from '../src/metrics/metrics.js';
 
 describe('Metrics endpoint', () => {
   test('/metrics exposes Prometheus metrics', async () => {

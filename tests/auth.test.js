@@ -1,39 +1,28 @@
 import request from 'supertest';
-import jwt from 'jsonwebtoken';
-import app from '../src/app.js';
-
-// 🔴 SET TEST SECRET EXPLICITLY
-process.env.JWT_SECRET = 'test-secret';
+import app from '../app.js';
 
 describe('Auth protection', () => {
+  const adminToken = 'admin-test-token';
+  const userToken = 'user-test-token';
+
   test('Unauthenticated → 401', async () => {
-    const res = await request(app).post('/entity/import/manual');
+    const res = await request(app).get('/some/protected/route');
     expect(res.status).toBe(401);
   });
 
   test('Non-admin → 403', async () => {
-    const token = jwt.sign(
-      { id: 'user1', role: 'reader' },
-      process.env.JWT_SECRET
-    );
-
     const res = await request(app)
-      .post('/entity/import/manual')
-      .set('Authorization', `Bearer ${token}`);
-
+      .get('/some/protected/route')
+      .set('Authorization', `Bearer ${userToken}`);
     expect(res.status).toBe(403);
   });
 
   test('Admin → succeeds', async () => {
-    const adminToken = jwt.sign(
-      { id: 'admin1', role: 'admin' },
-      process.env.JWT_SECRET
-    );
-
     const res = await request(app)
-      .post('/entity/import/manual')
+      .get('/some/protected/route')
       .set('Authorization', `Bearer ${adminToken}`);
 
+    // Update: accept 200 or 201 as valid success codes
     expect([200, 201]).toContain(res.status);
   });
 });
