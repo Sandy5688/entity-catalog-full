@@ -1,42 +1,24 @@
 import pool from '../services/db.js';
-import { logAdminAction } from '../services/adminAudit.service.js';
 
-  if (!sourceId || !targetId) {
-    return res.status(400).json({ message: 'sourceId and targetId required' });
+export async function getEntityById(req, res) {
+  const { id } = req.params;
+
+  const result = await pool.query(
+    'SELECT * FROM entity_catalog WHERE id = $1',
+    [id]
+  );
+
+  if (!result.rows.length) {
+    return res.status(404).json({ message: 'Entity not found' });
   }
 
-  // Log action (safe in tests)
-  await logAdminAction();
+  res.json(result.rows[0]);
+}
 
-  // Dry run — no mutation
-  if (dryRun) {
-    return res.status(200).json({
-      dryRun: true,
-      sourceId,
-      targetId,
-    });
-  }
+export async function listEntities(req, res) {
+  const result = await pool.query(
+    'SELECT * FROM entity_catalog WHERE is_active = true'
+  );
 
-  // Actual merge
-  try {
-    await pool.query(
-      `
-      UPDATE entity_catalog
-      SET is_active = false
-      WHERE id = $1
-      `,
-      [sourceId]
-    );
-  } catch (err) {
-    // Allow tests to pass even if schema differs
-    if (process.env.NODE_ENV !== 'test') {
-      throw err;
-    }
-  }
-
-  return res.status(200).json({
-    merged: true,
-    sourceId,
-    targetId,
-  });
+  res.json(result.rows);
 }
